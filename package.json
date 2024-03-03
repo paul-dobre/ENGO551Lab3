@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "leaflet.markercluster": "^1.5.3",
+    "overlapping-marker-spiderfier-leaflet": "^0.2.7"
+  }
+}
