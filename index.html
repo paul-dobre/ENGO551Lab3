@@ -29,24 +29,37 @@
 
 <script>
 
+    //Initializing base leaflet map with open street map centered at Calgary
     var map = L.map('map').setView([51.0347, -114.0719], 11);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
+
+    //Initializing the marker cluster group to add the markers from the API response so they are visualized as clusters
     var markers = L.markerClusterGroup();
+
+    //Creating function loadMap so that whenever a new start and end date are submitted, the map is reloaded with the new data
     function loadMap(startDate, endDate) {
-        console.log('https://data.calgary.ca/resource/c2es-76ed.geojson?$where=issueddate > '+startDate+' and issueddate < '+endDate+'')
+
+        //Fetching the API GeoJSON
         fetch(`https://data.calgary.ca/resource/c2es-76ed.geojson?$where=issueddate > '${startDate}' and issueddate < '${endDate}'`)
+        //if a response is received, perform an action
         .then(response => {
+
+            //Checking if the response was unsuccessful
             if (!response.ok) {
             throw new Error('Network response was not ok');
             }
             return response.json();
         })
+        //If the response was successful, the data is visualized onto the map
         .then(data => {
-
+            
+            //Clearing the data from previous responses
             markers.clearLayers();
+
+            //Creating the individual markers and binding the information to pop-ups for each marker
             L.geoJSON(data, {
                 onEachFeature: function (feature, layer) {
                     var popupContent = '<b> Build Permit Info: </b>';
@@ -59,24 +72,26 @@
                 }
             }).addTo(markers);
 
+            //Adding the marker clusters to the map as a layer
             map.addLayer(markers);
 
 
-
+            //Logging the API response
             console.log(data);
-            console.log(data.features[0].properties.communityname)
         })
+        //Printing the error returned if there was one.
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
         });
     }
 
+    //Initial call to display on the map
     loadMap('2000-01-01', '2001-01-01');
     
 </script>
 
 <!--Date range picker taken from here: https://www.daterangepicker.com/-->
-<input class="date" type="text" name="daterange" value="01/01/2000 - 01/15/2001" />
+<input class="date" type="text" name="daterange" value="01/01/2000 - 01/01/2001" />
 
 <script>
 
@@ -84,7 +99,10 @@ $(function() {
   $('input[name="daterange"]').daterangepicker({
     opens: 'center'
   }, function(start, end, label) {
+    //Calling the function when a date is submitted by the user
     loadMap(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+
+    //Logging the selected date into the console
     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
   });
   
