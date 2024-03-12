@@ -31,10 +31,23 @@
 
     //Initializing base leaflet map with open street map centered at Calgary
     var map = L.map('map').setView([51.0347, -114.0719], 11);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+    //Initializing basemap
+    var base = L.tileLayer('https://api.mapbox.com/styles/v1/ypaul/cltmfdyza016o01pta45m7rrf/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoieXBhdWwiLCJhIjoiY2xyYjNuNnM4MGpsdzJpcDd3ejEwanZyNCJ9.sLUzXHaHcm89Z7qNctEdDQ', {
         maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    })
+
+    base.addTo(map);
+
+    //Initializing map with crashes.
+    var crash = L.tileLayer('https://api.mapbox.com/styles/v1/ypaul/cltm24zkm014t01o8cqkpgpve/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoieXBhdWwiLCJhIjoiY2xyYjNuNnM4MGpsdzJpcDd3ejEwanZyNCJ9.sLUzXHaHcm89Z7qNctEdDQ', {maxZoom: 19,})
+
+    //Creating variable to store the two basemap layers to swap between
+    var baseMaps = {
+        "Base Map": base,
+        "2017 Traffic Incidents": crash
+    };
+
 
     //Initializing the marker cluster group to add the markers from the API response so they are visualized as clusters
     var markers = L.markerClusterGroup();
@@ -72,8 +85,16 @@
                 }
             }).addTo(markers);
 
+            //Creating variable representing the permit markers so they can be passed to the control and turned on and off
+            var overlayMaps = {
+                "Building Permits": markers
+            };
+
             //Adding the marker clusters to the map as a layer
             map.addLayer(markers);
+
+            //Initializing control so the car accidents and permits can be turned on and off
+            L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 
             //Logging the API response
@@ -87,6 +108,8 @@
 
     //Initial call to display on the map
     loadMap('2000-01-01', '2001-01-01');
+
+    
     
 </script>
 
