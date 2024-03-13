@@ -29,6 +29,9 @@
 
 <script>
 
+    //The count is necessary to ensure that the layer control is only created once
+    var count = 1;
+
     //Initializing base leaflet map with open street map centered at Calgary
     var map = L.map('map').setView([51.0347, -114.0719], 11);
 
@@ -93,8 +96,15 @@
             //Adding the marker clusters to the map as a layer
             map.addLayer(markers);
 
+            
+
             //Initializing control so the car accidents and permits can be turned on and off
-            L.control.layers(baseMaps, overlayMaps).addTo(map);
+            //Checking if the control has already been added to the map with the count
+            if (count == 1) {
+                // Remove the existing control layer
+                L.control.layers(baseMaps, overlayMaps).addTo(map);
+                count--;
+            }
 
 
             //Logging the API response
